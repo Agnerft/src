@@ -11,17 +11,16 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 )
 
 func main() {
 
-	// desktopPath, _ := os.UserHomeDir()
-	// nomeInstalador := "MicroSIP"
+	desktopPath, _ := os.UserHomeDir()
+	nomeInstalador := "MicroSIP"
 
-	// link := "https://raw.githubusercontent.com/Agnerft/microsip/main/TESTE/MicroSIP1/MicroSIP.txt"
-	// resultadoIni := salvarArquivo(link, desktopPath+"\\AppData\\Roaming\\", nomeInstalador, ".ini")
+	link := "https://raw.githubusercontent.com/Agnerft/microsip/main/TESTE/MicroSIP1/MicroSIP.txt"
+	resultadoIni := salvarArquivo(link, desktopPath+"\\AppData\\Roaming\\", nomeInstalador, ".ini")
 
 	jsonfile, _ := database.BuscaPorDoc(12310400000182)
 
@@ -32,33 +31,46 @@ func main() {
 	}
 
 	fmt.Println(clienteConfig)
+	fmt.Println("passou aqui?")
 
-	// for _, config := range clienteConfig {
-	// 	linkCompleto := config.GrupoRecurso + config.LinkGvc + config.Porta
-	// 	editor(resultadoIni, 2, "label="+config.Ramal)
-	// 	editor(resultadoIni, 3, "server="+linkCompleto)
-	// 	editor(resultadoIni, 4, "proxy="+linkCompleto)
-	// 	editor(resultadoIni, 5, "domain="+linkCompleto)
-	// 	editor(resultadoIni, 6, "username="+config.Ramal)
-	// 	editor(resultadoIni, 7, "password="+config.Ramal+config.Senha)
-	// 	editor(resultadoIni, 8, "authID="+config.Ramal)
-
-	// }
-
-	//O ramal que você deseja encontrar
-
-	for i := range clienteConfig[0].QuantRamaisOpen {
-		ramalDesejado, _ := strconv.Atoi(clienteConfig[0].Ramal)
-
-		if clienteConfig[0].QuantRamaisOpen[i].Ramal == ramalDesejado {
-			clienteConfig[0].QuantRamaisOpen[i].INUSE = true
-
-			break // Parar o loop após encontrar o ramal desejado
-		}
+	for _, config := range clienteConfig {
+		linkCompleto := config.GrupoRecurso + config.LinkGvc + config.Porta
+		editor(resultadoIni, 2, "label="+config.Ramal)
+		editor(resultadoIni, 3, "server="+linkCompleto)
+		editor(resultadoIni, 4, "proxy="+linkCompleto)
+		editor(resultadoIni, 5, "domain="+linkCompleto)
+		editor(resultadoIni, 6, "username="+config.Ramal)
+		editor(resultadoIni, 7, "password="+config.Ramal+config.Senha)
+		editor(resultadoIni, 8, "authID="+config.Ramal)
 
 	}
 
-	database.AtualizarINUSE(1)
+	id := database.AtualizarINUSE(1)
+	fmt.Println(id)
+
+	database.CriarCliente(2)
+
+	//O ramal que você deseja encontrar
+
+	// for i := range clienteConfig[0].QuantRamaisOpen {
+	// 	ramalDesejado, _ := strconv.Atoi(clienteConfig[0].Ramal)
+
+	// 	if clienteConfig[0].QuantRamaisOpen[i].Ramal == ramalDesejado {
+	// 		clienteConfig[0].QuantRamaisOpen[i].INUSE = true
+
+	// 		break // Parar o loop após encontrar o ramal desejado
+	// 	}
+
+	// }
+	// quantRamaisOpen := make(map[string]interface{})
+
+	// clientes := quantRamaisOpen["clientes"].([]map[string]interface{})
+	// primeiroCliente := clientes[0]
+	// fmt.Println("ID do primeiro cliente:", primeiroCliente["id"])
+
+	// // Exemplo de como acessar valores em quantRamaisOpen
+	// quantRamais := primeiroCliente["quantRamaisOpen"].([]map[string]interface{})
+	// fmt.Println("Estado do ramal 7801:", quantRamais[0]["INUSE"])
 
 }
 func editor(resultado string, numeroLinha int, novoValor string) {
