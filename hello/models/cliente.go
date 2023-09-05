@@ -20,3 +20,36 @@ type ClienteConfig struct {
 type Cliente struct {
 	Clientes []ClienteConfig `json:"clientes"`
 }
+
+func AdicionarCliente(mapa map[string]interface{}, id int, doc int, cliente string, grupoRecurso string, linkGvc string, porta string, ramal interface{}, senha string) {
+	clientes := []map[string]interface{}{
+		{
+			"id":              id,
+			"doc":             doc,
+			"cliente":         cliente,
+			"grupoRecurso":    grupoRecurso,
+			"linkGvc":         linkGvc,
+			"porta":           porta,
+			"ramal":           ramal,
+			"senha":           senha,
+			"quantRamaisOpen": []map[string]interface{}{},
+		},
+	}
+
+	mapa["clientes"] = clientes
+}
+
+func AdicionarRamal(mapa map[string]interface{}, clienteID int, ramalNum int, inUse bool) {
+	clientes := mapa["clientes"].([]map[string]interface{})
+	for i := range clientes {
+		if clientes[i]["id"].(int) == clienteID {
+			ramais := clientes[i]["quantRamaisOpen"].([]map[string]interface{})
+			ramal := map[string]interface{}{
+				"ramal": 780 + ramalNum,
+				"INUSE": inUse,
+			}
+			clientes[i]["quantRamaisOpen"] = append(ramais, ramal)
+			break
+		}
+	}
+}
