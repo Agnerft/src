@@ -45,29 +45,29 @@ func BuscaPorDoc(doc int) (string, error) {
 		//return
 
 	}
-	fmt.Println(string(body))
+	//fmt.Println(string(body))
 
 	return string(body), nil
 }
 
-func AtualizarINUSE(resourceID int) {
+func AtualizarINUSE(resourceID int) int {
 	jsons, _ := BuscaPorDoc(12310400000182)
 
 	// Defina a URL do servidor JSON Server e o JSON de atualização
 	serverURL := "http://localhost:3004" // Substitua pela URL correta do seu servidor JSON Server
 
-	for _, test := range clienteConfig {
+	updateData := make(map[string]interface{})
 
-		fmt.Println(test.QuantRamaisOpen[0].Ramal)
-		fmt.Println("Passou aq")
+	// for i := range clienteConfig[0].QuantRamaisOpen {
+	// 	ramalDesejado, _ := strconv.Atoi(clienteConfig[0].Ramal)
 
-	}
+	// 	if clienteConfig[0].QuantRamaisOpen[i].Ramal == ramalDesejado {
+	// 		clienteConfig[0].QuantRamaisOpen[i].INUSE = true
 
-	//resourceID                           // Substitua pelo ID do recurso que você deseja atualizar
-	updateData := map[string]interface{}{
+	// 		break // Parar o loop após encontrar o ramal desejado
+	// 	}
 
-		// Defina os campos que você deseja atualizar
-	}
+	// }
 
 	fmt.Println(jsons)
 	fmt.Println(serverURL)
@@ -75,7 +75,7 @@ func AtualizarINUSE(resourceID int) {
 	updateJSON, err := json.Marshal(updateData)
 	if err != nil {
 		fmt.Println("Erro ao codificar os dados de atualização em JSON:", err)
-		return
+		//return
 	}
 
 	// Crie uma solicitação HTTP PATCH para atualizar o recurso
@@ -83,7 +83,7 @@ func AtualizarINUSE(resourceID int) {
 	req, err := http.NewRequest("PATCH", url, bytes.NewBuffer(updateJSON))
 	if err != nil {
 		fmt.Println("Erro ao criar a solicitação HTTP PATCH:", err)
-		return
+		//return
 	}
 
 	req.Header.Set("Content-Type", "application/json")
@@ -93,7 +93,7 @@ func AtualizarINUSE(resourceID int) {
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Erro na solicitação HTTP PATCH:", err)
-		return
+		//return
 	}
 	defer resp.Body.Close()
 
@@ -103,4 +103,58 @@ func AtualizarINUSE(resourceID int) {
 		fmt.Println("Erro ao atualizar o recurso. Status code:", resp.StatusCode)
 	}
 
+	return resourceID
+
+}
+
+func CriarCliente(resourceID int) int {
+	serverURL := "http://localhost:3004" // Substitua pela URL correta do seu servidor JSON Server
+
+	updateData := make(map[string]interface{})
+	models.AdicionarCliente(updateData, 1, 12310400000182, "make2", "make", ".gvctelecom.com.br:", "5071", "7801", "@abc")
+
+	clientes := updateData["clientes"].([]map[string]interface{})
+	primeiroCliente := clientes[0]
+	quantRamais := primeiroCliente["quantRamaisOpen"].([]map[string]interface{})
+
+	models.AdicionarCliente(updateData, 1, 12310400000182, "make2", "make", ".gvctelecom.com.br:", "5071", "7801", "@abc")
+
+	models.AdicionarRamal(updateData, 1, 1, false)
+	models.AdicionarRamal(updateData, 1, 2, false)
+
+	fmt.Println(primeiroCliente)
+	fmt.Println(quantRamais)
+
+	updateJSON, err := json.Marshal(primeiroCliente)
+	if err != nil {
+		fmt.Println("Erro ao codificar os dados de atualização em JSON:", err)
+		//return
+	}
+
+	// Crie uma solicitação HTTP PATCH para atualizar o recurso
+	url := fmt.Sprintf("%s/clientes/%d", serverURL, resourceID)
+	req, err := http.NewRequest("PATCH", url, bytes.NewBuffer(updateJSON))
+	if err != nil {
+		fmt.Println("Erro ao criar a solicitação HTTP PATCH:", err)
+		//return
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	// Faça a solicitação HTTP PATCH
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println("Erro na solicitação HTTP PATCH:", err)
+		//return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		fmt.Println("Recurso atualizado com sucesso.")
+	} else {
+		fmt.Println("Erro ao atualizar o recurso. Status code:", resp.StatusCode)
+	}
+
+	return resourceID
 }
